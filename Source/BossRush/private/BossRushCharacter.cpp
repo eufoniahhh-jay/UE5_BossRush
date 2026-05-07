@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
+#include "PlayerCombatComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -54,6 +55,9 @@ ABossRushCharacter::ABossRushCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	// Day2. 전투 컴포넌트
+	CombatComponent = CreateDefaultSubobject<UPlayerCombatComponent>(TEXT("CombatComponent"));
 }
 
 void ABossRushCharacter::BeginPlay()
@@ -138,7 +142,7 @@ void ABossRushCharacter::LightAttack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Player] LightAttack input pressed"));
 
-	if (!LightAttackMontage)
+	/*if (!LightAttackMontage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[Player] LightAttackMontage is null"));
 		return;
@@ -159,5 +163,15 @@ void ABossRushCharacter::LightAttack()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Player] Play LightAttackMontage: %s"), *LightAttackMontage->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("[Player] Play LightAttackMontage: %s"), *LightAttackMontage->GetName());*/
+
+	// Day2. 전투 컴포넌트
+	// 이제 Character는 입력만 받고, 실제 공격 처리는 PlayerCombatComponent가 담당
+	if (!CombatComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] CombatComponent is null"));
+		return;
+	}
+
+	CombatComponent->LightAttack();
 }
