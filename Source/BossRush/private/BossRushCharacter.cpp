@@ -13,6 +13,7 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "PlayerCombatComponent.h"
+#include "PlayerStatComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,6 +59,8 @@ ABossRushCharacter::ABossRushCharacter()
 
 	// Day2. 전투 컴포넌트
 	CombatComponent = CreateDefaultSubobject<UPlayerCombatComponent>(TEXT("CombatComponent"));
+	// Day3. 플레이어 스탯 컴포넌트
+	StatComponent = CreateDefaultSubobject<UPlayerStatComponent>(TEXT("StatComponent"));
 }
 
 void ABossRushCharacter::BeginPlay()
@@ -95,6 +98,9 @@ void ABossRushCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Day1. Attacking
 		EnhancedInputComponent->BindAction(LightAttackAction, ETriggerEvent::Started, this, &ThisClass::LightAttack);
+
+		// Day3. 플레이어 HP가 HUD 동기화 잘 되는지 확인 용도의 테스트
+		EnhancedInputComponent->BindAction(TestDamageAction, ETriggerEvent::Started, this, &ThisClass::TestDamage);
 	}
 	else
 	{
@@ -174,4 +180,17 @@ void ABossRushCharacter::LightAttack()
 	}
 
 	CombatComponent->LightAttack();
+}
+
+void ABossRushCharacter::TestDamage()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Player] TestDamage input pressed"));
+
+	if (!StatComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] StatComponent is null"));
+		return;
+	}
+
+	StatComponent->TakeDamage(10.0f);
 }

@@ -13,6 +13,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UPlayerCombatComponent;
+class UPlayerStatComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -53,9 +54,12 @@ class ABossRushCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* LightAttackMontage;
 
+	// Day3. 플레이어 HP가 HUD 동기화 잘 되는지 확인 용도의 테스트 IA
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* TestDamageAction;
+
 public:
 	ABossRushCharacter();
-	
 
 protected:
 
@@ -67,7 +71,9 @@ protected:
 
 	// Day1. Attacking
 	void LightAttack();
-			
+
+	// Day3. 플레이어 HP가 HUD 동기화 잘 되는지 확인 용도의 테스트 함수
+	void TestDamage();
 
 protected:
 	// APawn interface
@@ -86,8 +92,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UPlayerCombatComponent* CombatComponent;
 
+	// Day3. Player Stat 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
+	UPlayerStatComponent* StatComponent;
+
 public:
 	// 전투 컴포넌트 getter 함수
 	FORCEINLINE UPlayerCombatComponent* GetCombatComponent() const { return CombatComponent; }
+
+	// 플레이어 스탯 컴포넌트 getter 함수
+	FORCEINLINE UPlayerStatComponent* GetStatComponent() const { return StatComponent; }
 };
 
