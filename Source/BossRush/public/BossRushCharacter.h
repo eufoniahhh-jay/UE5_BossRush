@@ -58,6 +58,10 @@ class ABossRushCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* TestDamageAction;
 
+	// Day5. 회피 입력 액션 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DodgeAction;
+
 public:
 	ABossRushCharacter();
 
@@ -74,6 +78,9 @@ protected:
 
 	// Day3. 플레이어 HP가 HUD 동기화 잘 되는지 확인 용도의 테스트 함수
 	void TestDamage();
+
+	// Day5. 회피 입력 액션
+	void Dodge();
 
 protected:
 	// APawn interface

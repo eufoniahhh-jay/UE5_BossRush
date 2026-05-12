@@ -12,6 +12,8 @@ class BOSSRUSH_API UPlayerStatComponent : public UActorComponent
 public:
     UPlayerStatComponent();
 
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
     UFUNCTION(BlueprintCallable, Category = "Stats")
     float GetCurrentHP() const { return CurrentHP; }
 
@@ -38,6 +40,14 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Stats")
     void RecoverStamina(float Amount);
+
+    // (회피에 사용할) 스태미너가 충분한지 확인하는 함수
+    UFUNCTION(BlueprintCallable, Category = "Stats")
+    bool HasEnoughStamina(float Amount) const;
+
+    // 스태미너 회복
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats|Stamina", meta = (AllowPrivateAccess = "true"))
+    float StaminaRegenPerSecond = 12.0f;
 
 protected:
     virtual void BeginPlay() override;

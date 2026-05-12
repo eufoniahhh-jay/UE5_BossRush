@@ -2,7 +2,7 @@
 
 UPlayerStatComponent::UPlayerStatComponent()
 {
-    PrimaryComponentTick.bCanEverTick = false;
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UPlayerStatComponent::BeginPlay()
@@ -15,6 +15,19 @@ void UPlayerStatComponent::BeginPlay()
 
     UE_LOG(LogTemp, Warning, TEXT("[PlayerStat] Init HP %.1f / %.1f, Stamina %.1f / %.1f"),
         CurrentHP, MaxHP, CurrentStamina, MaxStamina);
+}
+
+void UPlayerStatComponent::TickComponent(
+    float DeltaTime,
+    ELevelTick TickType,
+    FActorComponentTickFunction* ThisTickFunction)
+{
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    if (CurrentStamina < MaxStamina)
+    {
+        RecoverStamina(StaminaRegenPerSecond * DeltaTime);
+    }
 }
 
 float UPlayerStatComponent::GetHPRatio() const
@@ -67,4 +80,9 @@ void UPlayerStatComponent::ConsumeStamina(float Amount)
 void UPlayerStatComponent::RecoverStamina(float Amount)
 {
     CurrentStamina = FMath::Clamp(CurrentStamina + Amount, 0.0f, MaxStamina);
+}
+
+bool UPlayerStatComponent::HasEnoughStamina(float Amount) const
+{
+    return CurrentStamina >= Amount;
 }

@@ -101,6 +101,9 @@ void ABossRushCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Day3. 플레이어 HP가 HUD 동기화 잘 되는지 확인 용도의 테스트
 		EnhancedInputComponent->BindAction(TestDamageAction, ETriggerEvent::Started, this, &ThisClass::TestDamage);
+
+		// Day5. 회피 액션 바인딩
+		EnhancedInputComponent->BindAction(DodgeAction,	ETriggerEvent::Started,	this, &ThisClass::Dodge);
 	}
 	else
 	{
@@ -193,4 +196,17 @@ void ABossRushCharacter::TestDamage()
 	}
 
 	StatComponent->TakeDamage(10.0f);
+}
+
+void ABossRushCharacter::Dodge()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Player] Dodge input pressed"));
+
+	if (!CombatComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] CombatComponent is null"));
+		return;
+	}
+
+	CombatComponent->Dodge();
 }

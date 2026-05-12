@@ -6,6 +6,9 @@
 #include "Animation/AnimMontage.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "PlayerStatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "TimerManager.h"
 
 UPlayerCombatComponent::UPlayerCombatComponent()
 {
@@ -21,6 +24,14 @@ void UPlayerCombatComponent::BeginPlay()
     if (!OwnerCharacter)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Owner is not Character"));
+    }
+
+    // stat component 가져오기
+    OwnerStatComponent = OwnerCharacter->FindComponentByClass<UPlayerStatComponent>();
+
+    if (!OwnerStatComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] OwnerStatComponent is null"));
     }
 }
 
@@ -160,4 +171,86 @@ void UPlayerCombatComponent::PerformAttackTrace()
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Attack trace missed"));
     }
+}
+
+void UPlayerCombatComponent::Dodge()
+{
+    if (!OwnerCharacter)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: OwnerCharacter is null"));
+        return;
+    }
+
+    if (!OwnerStatComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: OwnerStatComponent is null"));
+        return;
+    }
+
+    if (bIsAttacking)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: currently attacking"));
+        return;
+    }
+
+    if (bIsDodging)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: already dodging"));
+        return;
+    }
+
+    if (!OwnerStatComponent->HasEnoughStamina(DodgeStaminaCost))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: not enough stamina"));
+        return;
+    }
+
+    OwnerStatComponent->ConsumeStamina(DodgeStaminaCost);
+
+    bIsDodging = true;
+    bIsInvincible = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge started"));
+
+    // 임시 회피 이동
+    const FVector DodgeDirection = OwnerCharacter->GetActorForwardVector();
+    OwnerCharacter->LaunchCharacter(DodgeDirection * DodgeStrength, true, false);
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_InvincibleStart,
+        FTimerDelegate::CreateUObject(this, &UPlayerCombatComponent::SetInvincible, true),
+        InvincibleStartDelay,
+        false
+    );
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_InvincibleEnd,
+        FTimerDelegate::CreateUObject(this, &UPlayerCombatComponent::SetInvincible, false),
+        InvincibleStartDelay + InvincibleDuration,
+        false
+    );
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_DodgeEnd,
+        this,
+        &UPlayerCombatComponent::FinishDodge,
+        DodgeDuration,
+        false
+    );
+}
+
+void UPlayerCombatComponent::SetInvincible(bool bNewInvincible)
+{
+    bIsInvincible = bNewInvincible;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Invincible: %s"),
+        bIsInvincible ? TEXT("true") : TEXT("false"));
+}
+
+void UPlayerCombatComponent::FinishDodge()
+{
+    bIsDodging = false;
+    bIsInvincible = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge finished"));
 }
