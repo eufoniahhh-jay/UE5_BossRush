@@ -104,6 +104,9 @@ void ABossRushCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Day5. 회피 액션 바인딩
 		EnhancedInputComponent->BindAction(DodgeAction,	ETriggerEvent::Started,	this, &ThisClass::Dodge);
+
+		// Day6. 패링 액션 바인딩
+		EnhancedInputComponent->BindAction(ParryAction,	ETriggerEvent::Started,	this, &ThisClass::Parry);
 	}
 	else
 	{
@@ -209,4 +212,17 @@ void ABossRushCharacter::Dodge()
 	}
 
 	CombatComponent->Dodge();
+}
+
+void ABossRushCharacter::Parry()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Player] Parry input pressed"));
+
+	if (!CombatComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] CombatComponent is null"));
+		return;
+	}
+
+	CombatComponent->Parry();
 }

@@ -62,6 +62,10 @@ class ABossRushCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DodgeAction;
 
+	// Day6. 패링 액션 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ParryAction;
+
 public:
 	ABossRushCharacter();
 
@@ -81,6 +85,9 @@ protected:
 
 	// Day5. 회피 입력 액션
 	void Dodge();
+
+	// DAy6. 패링 액션 함수
+	void Parry();
 
 protected:
 	// APawn interface

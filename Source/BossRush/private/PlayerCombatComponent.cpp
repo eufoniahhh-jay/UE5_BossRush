@@ -254,3 +254,95 @@ void UPlayerCombatComponent::FinishDodge()
 
     UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge finished"));
 }
+
+void UPlayerCombatComponent::Parry()
+{
+    if (!OwnerCharacter)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: OwnerCharacter is null"));
+        return;
+    }
+
+    if (!OwnerStatComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: OwnerStatComponent is null"));
+        return;
+    }
+
+    if (bIsAttacking)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: currently attacking"));
+        return;
+    }
+
+    if (bIsDodging)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: currently dodging"));
+        return;
+    }
+
+    if (bIsParrying)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: already parrying"));
+        return;
+    }
+
+    if (!OwnerStatComponent->HasEnoughStamina(ParryStaminaCost))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: not enough stamina"));
+        return;
+    }
+
+    OwnerStatComponent->ConsumeStamina(ParryStaminaCost);
+
+    bIsParrying = true;
+    bIsParryWindowOpen = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry started"));
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_ParryWindowStart,
+        this,
+        &UPlayerCombatComponent::OpenParryWindow,
+        ParryWindowStartDelay,
+        false
+    );
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_ParryWindowEnd,
+        this,
+        &UPlayerCombatComponent::CloseParryWindow,
+        ParryWindowStartDelay + ParryWindowDuration,
+        false
+    );
+
+    GetWorld()->GetTimerManager().SetTimer(
+        TimerHandle_ParryEnd,
+        this,
+        &UPlayerCombatComponent::FinishParry,
+        ParryTotalDuration,
+        false
+    );
+}
+
+void UPlayerCombatComponent::OpenParryWindow()
+{
+    bIsParryWindowOpen = true;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry window open"));
+}
+
+void UPlayerCombatComponent::CloseParryWindow()
+{
+    bIsParryWindowOpen = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry window closed"));
+}
+
+void UPlayerCombatComponent::FinishParry()
+{
+    bIsParrying = false;
+    bIsParryWindowOpen = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry finished"));
+}

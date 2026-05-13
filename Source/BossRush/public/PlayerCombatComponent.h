@@ -32,6 +32,19 @@ public:
     void SetInvincible(bool bNewInvincible);
     void FinishDodge();
 
+    // DAy6. 패링 액션 관련
+    void Parry();
+
+    UFUNCTION(BlueprintCallable, Category = "Combat|Parry")
+    bool IsParryWindowOpen() const { return bIsParryWindowOpen; }
+
+    UFUNCTION(BlueprintCallable, Category = "Combat|Parry")
+    bool IsParrying() const { return bIsParrying; }
+
+    void OpenParryWindow();
+    void CloseParryWindow();
+    void FinishParry();
+
 protected:
     virtual void BeginPlay() override;
 
@@ -82,4 +95,25 @@ private:
 
     UPROPERTY()
     UPlayerStatComponent* OwnerStatComponent;
+
+private:
+    // Day6. 패링 액션 관련 변수
+    UPROPERTY(EditAnywhere, Category = "Parry")
+    float ParryWindowStartDelay = 0.05f;
+
+    UPROPERTY(EditAnywhere, Category = "Parry")
+    float ParryWindowDuration = 0.25f;
+
+    UPROPERTY(EditAnywhere, Category = "Parry")
+    float ParryTotalDuration = 0.6f;
+
+    UPROPERTY(EditAnywhere, Category = "Parry")
+    float ParryStaminaCost = 15.0f;
+
+    bool bIsParrying = false;
+    bool bIsParryWindowOpen = false;
+
+    FTimerHandle TimerHandle_ParryWindowStart;
+    FTimerHandle TimerHandle_ParryWindowEnd;
+    FTimerHandle TimerHandle_ParryEnd;
 };
