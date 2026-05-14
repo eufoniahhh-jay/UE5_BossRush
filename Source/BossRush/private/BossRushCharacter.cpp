@@ -14,6 +14,8 @@
 #include "Animation/AnimMontage.h"
 #include "PlayerCombatComponent.h"
 #include "PlayerStatComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -22,6 +24,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ABossRushCharacter::ABossRushCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -69,6 +73,13 @@ void ABossRushCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ABossRushCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateLockOn(DeltaTime);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -107,6 +118,9 @@ void ABossRushCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Day6. 패링 액션 바인딩
 		EnhancedInputComponent->BindAction(ParryAction,	ETriggerEvent::Started,	this, &ThisClass::Parry);
+
+		// Day7. 락온 액션 바인딩
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Started, this, &ThisClass::ToggleLockOn);
 	}
 	else
 	{
@@ -139,6 +153,12 @@ void ABossRushCharacter::Move(const FInputActionValue& Value)
 
 void ABossRushCharacter::Look(const FInputActionValue& Value)
 {
+	// Day7. 락온 중 마우스 시점 조작 불가
+	if (bIsLockOn)
+	{
+		return;
+	}
+
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -225,4 +245,142 @@ void ABossRushCharacter::Parry()
 	}
 
 	CombatComponent->Parry();
+}
+
+void ABossRushCharacter::ToggleLockOn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[LockOn] Toggle input pressed"));
+
+	if (bIsLockOn)
+	{
+		DisableLockOn();
+		return;
+	}
+
+	AActor* Target = FindLockOnTarget();
+
+	if (!Target)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[LockOn] No target found"));
+		return;
+	}
+
+	EnableLockOn(Target);
+}
+
+void ABossRushCharacter::EnableLockOn(AActor* NewTarget)
+{
+	if (!NewTarget)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[LockOn] Enable failed: target is null"));
+		return;
+	}
+
+	LockOnTarget = NewTarget;
+	bIsLockOn = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("[LockOn] Enabled: %s"), *LockOnTarget->GetName());
+}
+
+void ABossRushCharacter::DisableLockOn()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[LockOn] Disabled"));
+
+	bIsLockOn = false;
+	LockOnTarget = nullptr;
+}
+
+void ABossRushCharacter::UpdateLockOn(float DeltaTime)
+{
+	if (!bIsLockOn)
+	{
+		return;
+	}
+
+	if (!LockOnTarget)
+	{
+		DisableLockOn();
+		return;
+	}
+
+	const float Distance = FVector::Distance(GetActorLocation(), LockOnTarget->GetActorLocation());
+
+	if (Distance > LockOnMaxDistance)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[LockOn] Target too far. Disable lock on."));
+		DisableLockOn();
+		return;
+	}
+
+	const FVector MyLocation = GetActorLocation();
+	const FVector TargetLocation = LockOnTarget->GetActorLocation();
+
+	FRotator LookAtRotation = (TargetLocation - MyLocation).Rotation();
+
+	// 캐릭터가 위아래로 기울지 않게 Yaw만 사용
+	FRotator TargetYawRotation(0.0f, LookAtRotation.Yaw, 0.0f);
+
+	FRotator NewActorRotation = FMath::RInterpTo(
+		GetActorRotation(),
+		TargetYawRotation,
+		DeltaTime,
+		LockOnInterpSpeed
+	);
+
+	SetActorRotation(NewActorRotation);
+
+	AController* OwnerController = GetController();
+
+	if (OwnerController)
+	{
+		/*const FVector CameraFocusLocation = LockOnTarget->GetActorLocation() + FVector(0.0f, 0.0f, 80.0f);
+		const FVector CameraStartLocation = GetActorLocation() + FVector(0.0f, 0.0f, 60.0f);*/
+		const FVector CameraFocusLocation = LockOnTarget->GetActorLocation() + FVector(0.0f, 0.0f, 80.0f);
+		const FVector CameraStartLocation = GetActorLocation() + FVector(0.0f, 0.0f, 140.0f);
+
+		FRotator TargetControlRotation = (CameraFocusLocation - CameraStartLocation).Rotation();
+
+		FRotator NewControlRotation = FMath::RInterpTo(
+			OwnerController->GetControlRotation(),
+			TargetControlRotation,
+			DeltaTime,
+			LockOnInterpSpeed
+		);
+
+		OwnerController->SetControlRotation(NewControlRotation);
+	}
+}
+
+AActor* ABossRushCharacter::FindLockOnTarget() const
+{
+	TArray<AActor*> BossActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Boss"), BossActors);
+
+	if (BossActors.Num() == 0)
+	{
+		return nullptr;
+	}
+
+	AActor* BestTarget = nullptr;
+	float BestDistanceSq = LockOnMaxDistance * LockOnMaxDistance;
+
+	const FVector MyLocation = GetActorLocation();
+
+	for (AActor* Candidate : BossActors)
+	{
+		if (!Candidate)
+		{
+			continue;
+		}
+
+		const float DistanceSq = FVector::DistSquared(MyLocation, Candidate->GetActorLocation());
+
+		if (DistanceSq <= BestDistanceSq)
+		{
+			BestDistanceSq = DistanceSq;
+			BestTarget = Candidate;
+		}
+	}
+
+	return BestTarget;
 }

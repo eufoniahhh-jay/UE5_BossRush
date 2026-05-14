@@ -66,6 +66,10 @@ class ABossRushCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ParryAction;
 
+	// Day7. 락온 액션 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* LockOnAction;
+
 public:
 	ABossRushCharacter();
 
@@ -86,8 +90,15 @@ protected:
 	// Day5. 회피 입력 액션
 	void Dodge();
 
-	// DAy6. 패링 액션 함수
+	// Day6. 패링 액션 함수
 	void Parry();
+
+	// Day7. 락온 함수
+	void ToggleLockOn();
+	void EnableLockOn(AActor* NewTarget);
+	void DisableLockOn();
+	void UpdateLockOn(float DeltaTime);
+	AActor* FindLockOnTarget() const;
 
 protected:
 	// APawn interface
@@ -95,6 +106,9 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	// Day7. 
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	/** Returns CameraBoom subobject **/
@@ -116,5 +130,19 @@ public:
 
 	// 플레이어 스탯 컴포넌트 getter 함수
 	FORCEINLINE UPlayerStatComponent* GetStatComponent() const { return StatComponent; }
+
+public:
+	// Day7. 락온 상태값
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LockOn", meta = (AllowPrivateAccess = "true"))
+	float LockOnInterpSpeed = 8.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LockOn", meta = (AllowPrivateAccess = "true"))
+	float LockOnMaxDistance = 2000.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LockOn", meta = (AllowPrivateAccess = "true"))
+	bool bIsLockOn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LockOn", meta = (AllowPrivateAccess = "true"))
+	AActor* LockOnTarget = nullptr;
 };
 

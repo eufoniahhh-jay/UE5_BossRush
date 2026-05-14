@@ -84,7 +84,7 @@ private:
     float InvincibleDuration = 0.3f;
 
     UPROPERTY(EditAnywhere, Category = "Dodge")
-    float DodgeStrength = 600.0f;
+    float DodgeStrength = 1000.0f;
 
     bool bIsDodging = false;
     bool bIsInvincible = false;
