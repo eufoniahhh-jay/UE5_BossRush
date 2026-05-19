@@ -24,6 +24,7 @@ void UPlayerCombatComponent::BeginPlay()
     if (!OwnerCharacter)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Owner is not Character"));
+        return;
     }
 
     // stat component 가져오기
@@ -37,7 +38,7 @@ void UPlayerCombatComponent::BeginPlay()
 
 void UPlayerCombatComponent::LightAttack()
 {
-    if (!OwnerCharacter)
+    /*if (!OwnerCharacter)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] OwnerCharacter is null"));
         return;
@@ -52,6 +53,11 @@ void UPlayerCombatComponent::LightAttack()
     if (!LightAttackMontage)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] LightAttackMontage is null"));
+        return;
+    }*/
+
+    if (!CanAttack())
+    {
         return;
     }
 
@@ -175,7 +181,7 @@ void UPlayerCombatComponent::PerformAttackTrace()
 
 void UPlayerCombatComponent::Dodge()
 {
-    if (!OwnerCharacter)
+    /*if (!OwnerCharacter)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: OwnerCharacter is null"));
         return;
@@ -202,6 +208,11 @@ void UPlayerCombatComponent::Dodge()
     if (!OwnerStatComponent->HasEnoughStamina(DodgeStaminaCost))
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: not enough stamina"));
+        return;
+    }*/
+
+    if (!CanDodge())
+    {
         return;
     }
 
@@ -257,7 +268,7 @@ void UPlayerCombatComponent::FinishDodge()
 
 void UPlayerCombatComponent::Parry()
 {
-    if (!OwnerCharacter)
+    /*if (!OwnerCharacter)
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: OwnerCharacter is null"));
         return;
@@ -290,6 +301,11 @@ void UPlayerCombatComponent::Parry()
     if (!OwnerStatComponent->HasEnoughStamina(ParryStaminaCost))
     {
         UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: not enough stamina"));
+        return;
+    }*/
+
+    if (!CanParry())
+    {
         return;
     }
 
@@ -345,4 +361,159 @@ void UPlayerCombatComponent::FinishParry()
     bIsParryWindowOpen = false;
 
     UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry finished"));
+}
+
+bool UPlayerCombatComponent::CanAttack() const
+{
+    /*if (!OwnerCharacter)
+    {
+        return false;
+    }
+
+    if (!LightAttackMontage)
+    {
+        return false;
+    }
+
+    if (bIsAttacking || bIsDodging || bIsParrying)
+    {
+        return false;
+    }
+
+    if (OwnerStatComponent && OwnerStatComponent->IsDead())
+    {
+        return false;
+    }
+
+    return true;*/
+
+    if (!OwnerCharacter)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] OwnerCharacter is null"));
+        return false;
+    }
+
+    if (bIsAttacking)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Already attacking"));
+        return false;
+    }
+
+    if (!LightAttackMontage)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] LightAttackMontage is null"));
+        return false;
+    }
+
+    return true;
+}
+
+bool UPlayerCombatComponent::CanDodge() const
+{
+    /*if (!OwnerCharacter || !OwnerStatComponent)
+    {
+        return false;
+    }
+
+    if (OwnerStatComponent->IsDead())
+    {
+        return false;
+    }
+
+    if (bIsAttacking || bIsDodging || bIsParrying)
+    {
+        return false;
+    }
+
+    return OwnerStatComponent->HasEnoughStamina(DodgeStaminaCost);*/
+
+    if (!OwnerCharacter)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: OwnerCharacter is null"));
+        return false;
+    }
+
+    if (!OwnerStatComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: OwnerStatComponent is null"));
+        return false;
+    }
+
+    if (bIsAttacking)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: currently attacking"));
+        return false;
+    }
+
+    if (bIsDodging)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: already dodging"));
+        return false;
+    }
+
+    if (!OwnerStatComponent->HasEnoughStamina(DodgeStaminaCost))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Dodge failed: not enough stamina"));
+        return false;
+    }
+
+    return true;
+}
+
+bool UPlayerCombatComponent::CanParry() const
+{
+    /*if (!OwnerCharacter || !OwnerStatComponent)
+    {
+        return false;
+    }
+
+    if (OwnerStatComponent->IsDead())
+    {
+        return false;
+    }
+
+    if (bIsAttacking || bIsDodging || bIsParrying)
+    {
+        return false;
+    }
+
+    return OwnerStatComponent->HasEnoughStamina(ParryStaminaCost);*/
+
+    if (!OwnerCharacter)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: OwnerCharacter is null"));
+        return false;
+    }
+
+    if (!OwnerStatComponent)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: OwnerStatComponent is null"));
+        return false;
+    }
+
+    if (bIsAttacking)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: currently attacking"));
+        return false;
+    }
+
+    if (bIsDodging)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: currently dodging"));
+        return false;
+    }
+
+    if (bIsParrying)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: already parrying"));
+        return false;
+    }
+
+    if (!OwnerStatComponent->HasEnoughStamina(ParryStaminaCost))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry failed: not enough stamina"));
+        return false;
+    }
+
+    return true;
 }

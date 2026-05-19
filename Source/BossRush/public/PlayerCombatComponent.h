@@ -45,6 +45,13 @@ public:
     void CloseParryWindow();
     void FinishParry();
 
+    // Day11. 조건 체크 헬퍼 함수
+    bool CanAttack() const;
+    bool CanDodge() const;
+    bool CanParry() const;
+
+    
+
 protected:
     virtual void BeginPlay() override;
 

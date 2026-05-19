@@ -67,4 +67,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
     bool bIsDead = false;
+
+public:
+    // Day11. 외부에서 사망 여부를 확인할 수 있는 getter 함수
+    UFUNCTION(BlueprintCallable, Category = "Stats")
+    bool IsDead() const { return bIsDead; }
 };

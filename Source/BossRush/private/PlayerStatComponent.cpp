@@ -24,7 +24,7 @@ void UPlayerStatComponent::TickComponent(
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    if (CurrentStamina < MaxStamina)
+    if (!bIsDead && CurrentStamina < MaxStamina)
     {
         RecoverStamina(StaminaRegenPerSecond * DeltaTime);
     }
