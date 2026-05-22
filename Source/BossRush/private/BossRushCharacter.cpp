@@ -16,6 +16,7 @@
 #include "PlayerStatComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "BossBase.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -121,6 +122,11 @@ void ABossRushCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Day7. 락온 액션 바인딩
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Started, this, &ThisClass::ToggleLockOn);
+
+		// Day14. 재시작 액션 바인딩
+		if (RestartAction) {
+			EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Started, this, &ABossRushCharacter::Input_Restart);
+		}
 	}
 	else
 	{
@@ -172,6 +178,13 @@ void ABossRushCharacter::Look(const FInputActionValue& Value)
 
 void ABossRushCharacter::LightAttack()
 {
+	// Day14. 게임 종료라면 인풋 막기
+	if (bIsPlayerInputLocked)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] LightAttack input pressed but, bIsPlayerInputLocked"));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("[Player] LightAttack input pressed"));
 
 	/*if (!LightAttackMontage)
@@ -223,6 +236,13 @@ void ABossRushCharacter::TestDamage()
 
 void ABossRushCharacter::Dodge()
 {
+	// Day14. 게임 종료라면 인풋 막기
+	if (bIsPlayerInputLocked)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] Dodge input pressed but, bIsPlayerInputLocked"));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("[Player] Dodge input pressed"));
 
 	if (!CombatComponent)
@@ -236,6 +256,13 @@ void ABossRushCharacter::Dodge()
 
 void ABossRushCharacter::Parry()
 {
+	// Day14. 게임 종료라면 인풋 막기
+	if (bIsPlayerInputLocked)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Player] Parry input pressed but, bIsPlayerInputLocked"));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("[Player] Parry input pressed"));
 
 	if (!CombatComponent)
@@ -249,6 +276,13 @@ void ABossRushCharacter::Parry()
 
 void ABossRushCharacter::ToggleLockOn()
 {
+	// Day14. 게임 종료라면 인풋 막기
+	if (bIsPlayerInputLocked)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[LockOn] Toggle input pressed but, bIsPlayerInputLocked"));
+		return;
+	}
+
 	UE_LOG(LogTemp, Warning, TEXT("[LockOn] Toggle input pressed"));
 
 	if (bIsLockOn)
@@ -383,4 +417,48 @@ AActor* ABossRushCharacter::FindLockOnTarget() const
 	}
 
 	return BestTarget;
+}
+
+bool ABossRushCharacter::CanRestartBattle() const
+{
+	if (StatComponent && StatComponent->IsDead())
+	{
+		return true;
+	}
+
+	ABossBase* Boss = Cast<ABossBase>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), ABossBase::StaticClass())
+	);
+
+	if (Boss && Boss->IsDead())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void ABossRushCharacter::Input_Restart()
+{
+	if (!CanRestartBattle())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Restart] Restart ignored: battle is not ended"));
+		return;
+	}
+
+	const FString CurrentLevelName = UGameplayStatics::GetCurrentLevelName(this, true);
+
+	UE_LOG(LogTemp, Warning, TEXT("[Restart] Restart level: %s"), *CurrentLevelName);
+
+	UGameplayStatics::OpenLevel(this, FName(*CurrentLevelName));
+}
+
+void ABossRushCharacter::SetPlayerInputLocked(bool bLocked)
+{
+	bIsPlayerInputLocked = bLocked;
+
+	if (bIsPlayerInputLocked && GetCharacterMovement())
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+	}
 }

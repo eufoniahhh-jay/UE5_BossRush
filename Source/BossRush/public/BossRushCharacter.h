@@ -70,6 +70,14 @@ class ABossRushCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LockOnAction;
 
+	// Day14. 재시작 변수
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* RestartAction;
+
+	// Day14. 게임 종료시 플레이어 인풋 막기 변수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Battle", meta = (AllowPrivateAccess = "true"))
+	bool bIsPlayerInputLocked = false;
+
 public:
 	ABossRushCharacter();
 
@@ -99,6 +107,16 @@ protected:
 	void DisableLockOn();
 	void UpdateLockOn(float DeltaTime);
 	AActor* FindLockOnTarget() const;
+
+	// Day14. 재시작 함수
+	UFUNCTION()
+	void Input_Restart();
+
+	bool CanRestartBattle() const;
+
+	// Day14. 게임 종료시 플레이어 인풋 막기 함수
+	UFUNCTION(BlueprintCallable, Category = "Battle")
+	void SetPlayerInputLocked(bool bLocked);
 
 protected:
 	// APawn interface
