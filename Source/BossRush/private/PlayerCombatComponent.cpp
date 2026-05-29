@@ -517,3 +517,57 @@ bool UPlayerCombatComponent::CanParry() const
 
     return true;
 }
+
+void UPlayerCombatComponent::AddAttackDamage(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    AttackDamage += Amount;
+
+    UE_LOG(LogTemp, Warning, TEXT("[CombatUpgrade] AddAttackDamage %.1f -> LightAttackDamage %.1f"),
+        Amount, AttackDamage);
+}
+
+void UPlayerCombatComponent::ReduceDodgeStaminaCost(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    DodgeStaminaCost = FMath::Max(0.0f, DodgeStaminaCost - Amount);
+
+    UE_LOG(LogTemp, Warning, TEXT("[CombatUpgrade] ReduceDodgeStaminaCost %.1f -> DodgeStaminaCost %.1f"),
+        Amount, DodgeStaminaCost);
+}
+
+void UPlayerCombatComponent::AddPlayerParryPostureDamage(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    PlayerParryPostureDamage += Amount;
+
+    UE_LOG(LogTemp, Warning, TEXT("[CombatUpgrade] AddPlayerParryPostureDamage %.1f -> PlayerParryPostureDamage %.1f"),
+        Amount, PlayerParryPostureDamage);
+}
+
+float UPlayerCombatComponent::GetLightAttackDamage() const
+{
+    return AttackDamage;
+}
+
+float UPlayerCombatComponent::GetDodgeStaminaCost() const
+{
+    return DodgeStaminaCost;
+}
+
+float UPlayerCombatComponent::GetPlayerParryPostureDamage() const
+{
+    return PlayerParryPostureDamage;
+}

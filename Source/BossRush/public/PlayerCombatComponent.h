@@ -50,7 +50,24 @@ public:
     bool CanDodge() const;
     bool CanParry() const;
 
-    
+    // Day19. 강화 함수 추가
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void AddAttackDamage(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void ReduceDodgeStaminaCost(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void AddPlayerParryPostureDamage(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    float GetLightAttackDamage() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    float GetDodgeStaminaCost() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    float GetPlayerParryPostureDamage() const;
 
 protected:
     virtual void BeginPlay() override;
@@ -116,6 +133,9 @@ private:
 
     UPROPERTY(EditAnywhere, Category = "Parry")
     float ParryStaminaCost = 15.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Parry")
+    float PlayerParryPostureDamage = 30.0f;
 
     bool bIsParrying = false;
     bool bIsParryWindowOpen = false;

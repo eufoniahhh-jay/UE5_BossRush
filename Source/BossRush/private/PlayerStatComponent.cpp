@@ -26,7 +26,8 @@ void UPlayerStatComponent::TickComponent(
 
     if (!bIsDead && CurrentStamina < MaxStamina)
     {
-        RecoverStamina(StaminaRegenPerSecond * DeltaTime);
+        //RecoverStamina(StaminaRegenPerSecond * DeltaTime);
+        RecoverStaminaByDeltaTime(DeltaTime);
     }
 }
 
@@ -48,6 +49,11 @@ float UPlayerStatComponent::GetStaminaRatio() const
     }
 
     return CurrentStamina / MaxStamina;
+}
+
+float UPlayerStatComponent::GetStaminaRegen() const
+{
+    return StaminaRegen;
 }
 
 void UPlayerStatComponent::TakeDamage(float DamageAmount)
@@ -82,7 +88,69 @@ void UPlayerStatComponent::RecoverStamina(float Amount)
     CurrentStamina = FMath::Clamp(CurrentStamina + Amount, 0.0f, MaxStamina);
 }
 
+void UPlayerStatComponent::RecoverStaminaByDeltaTime(float DeltaTime)
+{
+    if (bIsDead)
+    {
+        return;
+    }
+
+    if (CurrentStamina >= MaxStamina)
+    {
+        return;
+    }
+
+    RecoverStamina(StaminaRegen * DeltaTime);
+}
+
 bool UPlayerStatComponent::HasEnoughStamina(float Amount) const
 {
     return CurrentStamina >= Amount;
+}
+
+void UPlayerStatComponent::AddMaxHP(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    MaxHP += Amount;
+    CurrentHP = FMath::Clamp(CurrentHP + Amount, 0.0f, MaxHP);
+
+    UE_LOG(LogTemp, Warning, TEXT("[PlayerStat] AddMaxHP %.1f -> HP %.1f / %.1f"), Amount, CurrentHP, MaxHP);
+}
+
+void UPlayerStatComponent::AddMaxStamina(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    MaxStamina += Amount;
+    CurrentStamina = FMath::Clamp(CurrentStamina + Amount, 0.0f, MaxStamina);
+
+    UE_LOG(LogTemp, Warning, TEXT("[PlayerStat] AddMaxStamina %.1f -> Stamina %.1f / %.1f"), Amount, CurrentStamina, MaxStamina);
+}
+
+void UPlayerStatComponent::AddStaminaRegen(float Amount)
+{
+    if (Amount <= 0.0f)
+    {
+        return;
+    }
+
+    StaminaRegen += Amount;
+
+    UE_LOG(LogTemp, Warning, TEXT("[PlayerStat] AddStaminaRegen %.1f -> Regen %.1f"), Amount, StaminaRegen);
+}
+
+void UPlayerStatComponent::RestoreAllStats()
+{
+    CurrentHP = MaxHP;
+    CurrentStamina = MaxStamina;
+
+    UE_LOG(LogTemp, Warning, TEXT("[PlayerStat] RestoreAllStats -> HP %.1f / %.1f, Stamina %.1f / %.1f"),
+        CurrentHP, MaxHP, CurrentStamina, MaxStamina);
 }

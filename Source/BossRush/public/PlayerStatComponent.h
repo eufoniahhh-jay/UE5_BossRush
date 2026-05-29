@@ -33,6 +33,9 @@ public:
     float GetStaminaRatio() const;
 
     UFUNCTION(BlueprintCallable, Category = "Stats")
+    float GetStaminaRegen() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Stats")
     void TakeDamage(float DamageAmount);
 
     UFUNCTION(BlueprintCallable, Category = "Stats")
@@ -41,13 +44,27 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Stats")
     void RecoverStamina(float Amount);
 
+    UFUNCTION(BlueprintCallable, Category = "Stats")
+    void RecoverStaminaByDeltaTime(float DeltaTime);
+
     // (회피에 사용할) 스태미너가 충분한지 확인하는 함수
     UFUNCTION(BlueprintCallable, Category = "Stats")
     bool HasEnoughStamina(float Amount) const;
 
-    // 스태미너 회복
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats|Stamina", meta = (AllowPrivateAccess = "true"))
-    float StaminaRegenPerSecond = 12.0f;
+   
+
+    // Day19. 강화 효과 적용 함수
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void AddMaxHP(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void AddMaxStamina(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void AddStaminaRegen(float Amount);
+
+    UFUNCTION(BlueprintCallable, Category = "Upgrade")
+    void RestoreAllStats();
 
 protected:
     virtual void BeginPlay() override;
@@ -64,6 +81,13 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats|Stamina", meta = (AllowPrivateAccess = "true"))
     float CurrentStamina = 100.0f;
+
+    // 스태미너 회복
+    //UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats|Stamina", meta = (AllowPrivateAccess = "true"))
+    //float StaminaRegenPerSecond = 12.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats|Stamina", meta = (AllowPrivateAccess = "true"))
+    float StaminaRegen = 12.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats", meta = (AllowPrivateAccess = "true"))
     bool bIsDead = false;
