@@ -69,6 +69,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Combat")
     float GetPlayerParryPostureDamage() const;
 
+    // Day20. 플레이어 상태 초기화 함수
+    UFUNCTION(BlueprintCallable, Category = "Combat|State")
+    void ResetCombatState();
+
 protected:
     virtual void BeginPlay() override;
 

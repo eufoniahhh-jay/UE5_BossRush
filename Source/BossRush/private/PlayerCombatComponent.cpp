@@ -571,3 +571,17 @@ float UPlayerCombatComponent::GetPlayerParryPostureDamage() const
 {
     return PlayerParryPostureDamage;
 }
+
+void UPlayerCombatComponent::ResetCombatState()
+{
+    bIsAttacking = false;
+    bAttackHitAlready = false;
+
+    bIsDodging = false;
+    bIsInvincible = false;
+
+    bIsParrying = false;
+    bIsParryWindowOpen = false;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Combat] ResetCombatState"));
+}

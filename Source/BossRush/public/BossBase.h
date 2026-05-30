@@ -89,6 +89,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Boss|Posture")
 	float GetMaxPosture() const;
 
+
+	// Day20. 보스 초기화 함수
+	UFUNCTION(BlueprintCallable, Category = "Boss|State")
+	void ResetBossState();
+
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Boss|Event")
 	void OnBossDamaged(float FinalDamage);

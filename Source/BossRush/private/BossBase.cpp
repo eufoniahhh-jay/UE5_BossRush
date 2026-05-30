@@ -13,12 +13,15 @@ void ABossBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHP = MaxHP;
+	ResetBossState();
+
+	/*CurrentHP = MaxHP;
 	CurrentPosture = 0.0f;
 	bIsDead = false;
 	bIsStunned = false;
+	OnPostureChanged(CurrentPosture, MaxPosture);*/
 
-	OnPostureChanged(CurrentPosture, MaxPosture);
+	ResetBossState();
 }
 
 void ABossBase::Tick(float DeltaTime)
@@ -182,4 +185,18 @@ float ABossBase::GetCurrentPosture() const
 float ABossBase::GetMaxPosture() const
 {
 	return MaxPosture;
+}
+
+void ABossBase::ResetBossState()
+{
+	CurrentHP = MaxHP;
+	CurrentPosture = 0.0f;
+
+	bIsDead = false;
+	bIsStunned = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("[BossBase] ResetBossState -> HP %.1f / %.1f, Posture %.1f / %.1f"),
+		CurrentHP, MaxHP, CurrentPosture, MaxPosture);
+
+	OnPostureChanged(CurrentPosture, MaxPosture);
 }
