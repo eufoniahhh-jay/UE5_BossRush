@@ -55,6 +55,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss|State")
 	bool bIsStunned = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
+	bool bCurrentAttackParryable = true;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Boss|Damage")
 	virtual void ApplyBossDamage(float DamageAmount, float PostureDamage);
@@ -93,6 +96,9 @@ public:
 	// Day20. 보스 초기화 함수
 	UFUNCTION(BlueprintCallable, Category = "Boss|State")
 	void ResetBossState();
+
+	UFUNCTION(BlueprintCallable, Category = "Boss|Attack")
+	bool IsCurrentAttackParryable() const;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Boss|Event")

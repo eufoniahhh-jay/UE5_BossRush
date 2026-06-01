@@ -195,8 +195,15 @@ void ABossBase::ResetBossState()
 	bIsDead = false;
 	bIsStunned = false;
 
+	bCurrentAttackParryable = true;
+
 	UE_LOG(LogTemp, Warning, TEXT("[BossBase] ResetBossState -> HP %.1f / %.1f, Posture %.1f / %.1f"),
 		CurrentHP, MaxHP, CurrentPosture, MaxPosture);
 
 	OnPostureChanged(CurrentPosture, MaxPosture);
+}
+
+bool ABossBase::IsCurrentAttackParryable() const
+{
+	return bCurrentAttackParryable;
 }
