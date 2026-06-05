@@ -21,7 +21,7 @@ void ABossBase::BeginPlay()
 	bIsStunned = false;
 	OnPostureChanged(CurrentPosture, MaxPosture);*/
 
-	ResetBossState();
+	//ResetBossState();
 }
 
 void ABossBase::Tick(float DeltaTime)
