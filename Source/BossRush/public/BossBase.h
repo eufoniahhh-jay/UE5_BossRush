@@ -58,6 +58,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Attack")
 	bool bCurrentAttackParryable = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|State")
+	bool bIsInvincible = false;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Boss|Damage")
 	virtual void ApplyBossDamage(float DamageAmount, float PostureDamage);

@@ -41,6 +41,13 @@ void ABossBase::ApplyBossDamage(float DamageAmount, float PostureDamage)
 		return;
 	}
 
+	// Day28. 페이즈 전환 중 무적
+	if (bIsInvincible)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Boss] Damage ignored: Invincible"));
+		return;
+	}
+
 	const float SafeDamage = FMath::Max(0.0f, DamageAmount);
 	const float SafePostureDamage = FMath::Max(0.0f, PostureDamage);
 
