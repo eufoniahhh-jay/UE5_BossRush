@@ -66,12 +66,28 @@ ABossRushCharacter::ABossRushCharacter()
 	CombatComponent = CreateDefaultSubobject<UPlayerCombatComponent>(TEXT("CombatComponent"));
 	// Day3. 플레이어 스탯 컴포넌트
 	StatComponent = CreateDefaultSubobject<UPlayerStatComponent>(TEXT("StatComponent"));
+
+	/*UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("[Player Constructor] Combat=%s, Stat=%s"),
+		*GetNameSafe(CombatComponent),
+		*GetNameSafe(StatComponent)
+	);*/
 }
 
 void ABossRushCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	/*UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("[Player BeginPlay] Combat=%s, Stat=%s"),
+		*GetNameSafe(CombatComponent),
+		*GetNameSafe(StatComponent)
+	);*/
 }
 
 void ABossRushCharacter::Tick(float DeltaTime)

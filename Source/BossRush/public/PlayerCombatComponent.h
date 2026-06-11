@@ -45,6 +45,10 @@ public:
     void CloseParryWindow();
     void FinishParry();
 
+    // Day29. 패링 애니메이션 몽타주
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat|Parry")
+    UAnimMontage* ParryMontage;
+
     // Day11. 조건 체크 헬퍼 함수
     bool CanAttack() const;
     bool CanDodge() const;

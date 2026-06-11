@@ -314,6 +314,11 @@ void UPlayerCombatComponent::Parry()
     bIsParrying = true;
     bIsParryWindowOpen = false;
 
+    if (ParryMontage)
+    {
+        OwnerCharacter->PlayAnimMontage(ParryMontage);
+    }
+
     UE_LOG(LogTemp, Warning, TEXT("[Combat] Parry started"));
 
     GetWorld()->GetTimerManager().SetTimer(

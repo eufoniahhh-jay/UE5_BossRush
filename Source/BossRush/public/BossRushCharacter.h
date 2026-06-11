@@ -128,6 +128,9 @@ protected:
 	// Day7. 
 	virtual void Tick(float DeltaTime) override;
 
+	// Day29. 참조복구
+	//virtual void PostInitializeComponents() override;
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
